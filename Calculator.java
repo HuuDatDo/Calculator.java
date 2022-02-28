@@ -54,6 +54,11 @@ class Calculator{
         }
         return int_parts;
     }
+    //Change \n to ,
+    public String AlternativeDelimeter(){
+        String filteredEquation=this.equation.replace("\\n",",");
+        return filteredEquation;
+    }
 
     //Take the sum
     public int Sum(int[] arraysOfIntegers){
@@ -65,7 +70,8 @@ class Calculator{
     }
 
     public int Result() {
-        int[] arr = String2Int(this.equation);
+        String filteredEquation = AlternativeDelimeter();
+        int[] arr = String2Int(filteredEquation);
         int result = Sum(arr);
         return result;
     }
