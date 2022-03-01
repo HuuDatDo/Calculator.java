@@ -74,6 +74,26 @@ class Calculator{
         return filteredEquation;
     }
 
+    public int[] RemoveMoreThan1000(int[] arrayOfIntegers){
+        int numberOfDeletion=0;
+        int num=0;
+        for (int i=0;i<arrayOfIntegers.length;i++){
+            if (arrayOfIntegers[i]>1000){
+                numberOfDeletion++;
+            }
+        }
+        int[] processedArray = new int[arrayOfIntegers.length-numberOfDeletion];
+        for (int i=0;i<arrayOfIntegers.length;i++){
+            if (arrayOfIntegers[i]<1000){
+                processedArray[i-num]=arrayOfIntegers[i];
+            }
+            else{
+                num+=1;
+            }
+        }
+        return processedArray;
+    }
+
     //Take the sum
     public int Sum(int[] arraysOfIntegers){
         int sum =0;
@@ -86,6 +106,7 @@ class Calculator{
     public int Result() {
         String filteredEquation = AlternativeDelimeter(this.equation);
         int[] arr = String2Int(filteredEquation);
+        arr=RemoveMoreThan1000(arr);
         int result = Sum(arr);
         return result;
     }
@@ -124,6 +145,7 @@ class NegativeCalculator extends Calculator{
         int[] neg_arr= String2Int(filteredNegEquation);
         int pos_result = Sum(pos_arr);
         int neg_result = Sum(neg_arr);
+        pos_arr=RemoveMoreThan1000(arr);
         int[] finalResult={pos_result,neg_result};
         return finalResult;
     }
