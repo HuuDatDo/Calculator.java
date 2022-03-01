@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 class Main{
@@ -21,7 +22,7 @@ class Main{
         else{
             Calculator calculating = new Calculator(equation);
             System.out.println(calculating.Result());
-        }      
+        }
     }
 }
 
@@ -59,7 +60,7 @@ class Calculator{
         return processedArray;
     }    
     //Convert String array into int array
-    public int[]String2Int(String parts){
+    public int[] String2Int(String parts){
         String[] IntArray=EliminateInvalidations(parts);
         int[] int_parts= new int[IntArray.length];
         for (int i=0;i<IntArray.length;i++){
@@ -117,36 +118,76 @@ class NegativeCalculator extends Calculator{
         super(equation);
     }
 
-    public String[] SplitNegativeAndPositive(){
-        String neg="";
-        String pos="";
-        for(int i=0;i<this.equation.length();i++){
-            if (this.equation.charAt(i)==','){
-                continue;
-            }
-            if (this.equation.charAt(i)=='-'){
-                neg+=this.equation.substring(i,i+2);
-                neg+=",";
-                i++;
-            }
-            else{
-                pos+=this.equation.charAt(i);
-                pos+=",";
+    public int[][] SplitNegativeAndPositive(int[] equation){
+        int pos = 0;
+        int neg = 0;
+        for (int i = 0; i < equation.length ; i++) {
+            if(equation[i] >= 0){
+                pos++;
+            }else{
+                neg++;
             }
         }
-        String[] SplittedEquation={pos,neg};
-        return SplittedEquation;
+        int[] arr_pos = new int[pos];
+        int[] arr_neg = new int[neg];
+
+        int countpos = 0;
+        int countneg = 0;
+        for (int i = 0; i < equation.length ; i++) {
+            if(equation[i] > 0){
+                arr_pos[countpos] = equation[i];
+                countpos++;
+            }else{
+                arr_neg[countneg] = equation[i];
+                countneg++;
+            }
+        }
+        int[][] pos_and_neg={arr_pos,arr_neg};
+        return pos_and_neg;
     }
+
     public int[] NewResult() {
-        String[] pos_and_neg = SplitNegativeAndPositive();
-        String filteredPosEquation=AlternativeDelimeter(pos_and_neg[0]);
-        String filteredNegEquation=AlternativeDelimeter(pos_and_neg[1]);
-        int[] pos_arr= String2Int(filteredPosEquation);
-        int[] neg_arr= String2Int(filteredNegEquation);
-        int pos_result = Sum(pos_arr);
-        int neg_result = Sum(neg_arr);
-        pos_arr=RemoveMoreThan1000(arr);
-        int[] finalResult={pos_result,neg_result};
+        String filteredEquation=AlternativeDelimeter(this.equation);
+        int[] arr= String2Int(filteredEquation);
+        arr=RemoveMoreThan1000(arr);
+        int[][] pos_and_neg=SplitNegativeAndPositive(arr);
+        int[] pos_arr=pos_and_neg[0];
+        int[] neg_arr=pos_and_neg[1];
+        int pos_sum = Sum(pos_arr);
+        int neg_sum = Sum(neg_arr);
+        int[] finalResult={pos_sum,neg_sum};
         return finalResult;
+    }
+}
+
+class CalculatorWithDelimeters extends Calculator{
+
+    public CalculatorWithDelimeters(String equation) {
+        super(equation);
+    }
+
+    @Override
+    public String AlternativeDelimeter(String equation){
+        String replacedString;
+        String firstSign=equation.substring(0,2);
+        String secondSign=equation.substring(3,5);
+        if (firstSign.equals("//") && secondSign.equals("\\n")){
+            String delimeter = equation.substring(2,3);
+            String rawEquation=equation.substring(5,equation.length());
+            replacedString = rawEquation.replace(delimeter,",");
+            return replacedString;
+        }
+        else{
+            return equation;
+        }
+    }
+
+    public Result(){
+        String filteredEquation = AlternativeDelimeter(this.equation);
+        System.out.println(filteredEquation);
+        int[] arr = String2Int(filteredEquation);
+        arr=RemoveMoreThan1000(arr);
+        int result = Sum(arr);
+        return result;
     }
 }
