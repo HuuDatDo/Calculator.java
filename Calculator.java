@@ -14,21 +14,19 @@ class Main{
                 break;
             }
         }
-        //Requirement 4
         if(contain_neg){
-            NegativeCalculator negCalculator= new NegativeCalculator(equation);
-            System.out.println(Arrays.toString(negCalculator.NewResult()));
+            NegativeCalculator negCalculator = new NegativeCalculator(equation);
+            int[] neg_list = negCalculator.ThrowException();
+            throw new ArithmeticException(Arrays.toString(neg_list));
         }
-        else{
-            Calculator calculating = new Calculator(equation);
-            System.out.println(calculating.Result());
-        }
+        CalculatorWithDelimeters calculating = new CalculatorWithDelimeters(equation);
+        System.out.println(calculating.Result());
     }
 }
 
 class Calculator{
     
-    String equation;
+    String equation;    
 
     public Calculator(String equation){
         this.equation=equation;
@@ -118,45 +116,28 @@ class NegativeCalculator extends Calculator{
         super(equation);
     }
 
-    public int[][] SplitNegativeAndPositive(int[] equation){
-        int pos = 0;
+    public int[] SplitNegative(int[] equation){
         int neg = 0;
         for (int i = 0; i < equation.length ; i++) {
-            if(equation[i] >= 0){
-                pos++;
-            }else{
+            if(equation[i] < 0){
                 neg++;
             }
         }
-        int[] arr_pos = new int[pos];
         int[] arr_neg = new int[neg];
-
-        int countpos = 0;
         int countneg = 0;
         for (int i = 0; i < equation.length ; i++) {
-            if(equation[i] > 0){
-                arr_pos[countpos] = equation[i];
-                countpos++;
-            }else{
+            if(equation[i] < 0){
                 arr_neg[countneg] = equation[i];
                 countneg++;
             }
         }
-        int[][] pos_and_neg={arr_pos,arr_neg};
-        return pos_and_neg;
+        return arr_neg;
     }
 
-    public int[] NewResult() {
-        String filteredEquation=AlternativeDelimeter(this.equation);
-        int[] arr= String2Int(filteredEquation);
-        arr=RemoveMoreThan1000(arr);
-        int[][] pos_and_neg=SplitNegativeAndPositive(arr);
-        int[] pos_arr=pos_and_neg[0];
-        int[] neg_arr=pos_and_neg[1];
-        int pos_sum = Sum(pos_arr);
-        int neg_sum = Sum(neg_arr);
-        int[] finalResult={pos_sum,neg_sum};
-        return finalResult;
+    public int[] ThrowException(){
+        String filteredEquation = AlternativeDelimeter(equation);
+        int[] arr = String2Int(filteredEquation);
+        return SplitNegative();
     }
 }
 
@@ -166,25 +147,51 @@ class CalculatorWithDelimeters extends Calculator{
         super(equation);
     }
 
-    @Override
-    public String AlternativeDelimeter(String equation){
-        String replacedString;
-        String firstSign=equation.substring(0,2);
-        String secondSign=equation.substring(3,5);
-        if (firstSign.equals("//") && secondSign.equals("\\n")){
-            String delimeter = equation.substring(2,3);
-            String rawEquation=equation.substring(5,equation.length());
-            replacedString = rawEquation.replace(delimeter,",");
-            return replacedString;
+    public ArrayList<String> SplitDelimetersAndEquation(String equation){
+        ArrayList<String> arrayList = new ArrayList<>(); 
+        if (equation.charAt(0)!='/'){
+            arrayList.add(equation.replace("\n",","));
+            return arrayList;   
+        };
+        
+        String regex = "";
+        int i = 2;
+   
+        while(equation.charAt(i) != '\n'){
+            if(equation.charAt(i) != '['){
+                arrayList.add(String.valueOf(equation.charAt(i)));
+                i++;
+                break;
+            }
+            if(equation.charAt(i) == '['){
+                i++;
+                while(equation.charAt(i) != ']'){
+                    regex += equation.charAt(i);
+                    i++;
+                }
+            arrayList.add(regex);
+            regex = "";
+            i++;
+            }
         }
-        else{
-            return equation;
-        }
+        arrayList.add(equation.substring(i + 1, equation.length()));
+        return arrayList; 
     }
 
-    public Result(){
-        String filteredEquation = AlternativeDelimeter(this.equation);
-        System.out.println(filteredEquation);
+    public String NewAlternativeDelimeter(ArrayList<String> equation){
+        String filteredEquation=equation.get(equation.size()-1);
+        filteredEquation.replace("\n",",");
+        for (int i=0; i<equation.size()-1;i++){
+            String delimeter = equation.get(i);
+            filteredEquation=filteredEquation.replace(delimeter,",");
+        }
+        return filteredEquation;
+    }
+
+    @Override
+    public int Result(){
+        ArrayList<String> splittedEquation=SplitDelimetersAndEquation(this.equation);
+        String filteredEquation = NewAlternativeDelimeter(splittedEquation);
         int[] arr = String2Int(filteredEquation);
         arr=RemoveMoreThan1000(arr);
         int result = Sum(arr);
