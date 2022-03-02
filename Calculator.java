@@ -1,3 +1,5 @@
+package App;
+
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,11 +139,11 @@ class NegativeCalculator extends Calculator{
     public int[] ThrowException(){
         String filteredEquation = AlternativeDelimeter(equation);
         int[] arr = String2Int(filteredEquation);
-        return SplitNegative();
+        return SplitNegative(arr);
     }
 }
 
-class CalculatorWithDelimeters extends Calculator{
+public class CalculatorWithDelimeters extends Calculator{
 
     public CalculatorWithDelimeters(String equation) {
         super(equation);
